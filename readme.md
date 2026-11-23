@@ -1,5 +1,6 @@
 Bitácora exámen Catalina Figueroa
-
+**URL: 
+https://catalinafigueroad.github.io/catalinafigueroa-portafolio/
 **Link de figma:
 https://www.figma.com/design/SXMRTukRwmBfbdIrLTdNKg/catalina-figueroa-ex%C3%A1men-web?node-id=18-232&t=U2rwDPQBQUhJhBDC-1  
 
