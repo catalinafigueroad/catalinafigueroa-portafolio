@@ -1,0 +1,521 @@
+/* =========================================================
+   Portafolio Catalina Figueroa
+   ---------------------------------------------------------
+   El diseño es un collage con elementos libres, así que cada
+   página es un "lienzo" que escala con el ancho de la pantalla.
+
+   Cada elemento .pos recibe sus medidas de Figma en el HTML:
+     --x --y --w --h --fs      → versión desktop (lienzo de 1512 px)
+     --mx --my --mw --mh --mfs → versión mobile  (lienzo de 440 px)
+   y aquí se multiplican por --u (1 px de Figma en la pantalla).
+   ========================================================= */
+
+/* Las medidas no se heredan: cada elemento usa solo las suyas */
+@property --x { syntax: "*"; inherits: false; }
+@property --y { syntax: "*"; inherits: false; }
+@property --w { syntax: "*"; inherits: false; }
+@property --h { syntax: "*"; inherits: false; }
+@property --fs { syntax: "*"; inherits: false; }
+@property --mx { syntax: "*"; inherits: false; }
+@property --my { syntax: "*"; inherits: false; }
+@property --mw { syntax: "*"; inherits: false; }
+@property --mh { syntax: "*"; inherits: false; }
+@property --mfs { syntax: "*"; inherits: false; }
+
+:root {
+  --azul: #031cff;
+  --verde: #b3ff03;
+  --negro: #000;
+  --blanco: #fff;
+  --rojo: #ff0004;
+
+  --f-titulo: "Almendra Display", serif;
+  --f-boton: "Bitcount Single", monospace;
+  --f-texto: "Iosevka Charon Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--f-texto);
+  font-weight: 300;
+  line-height: normal;
+  /* permite medir el ancho real (sin barra de scroll) con cqw */
+  container-type: inline-size;
+  overflow-x: hidden;
+}
+
+body.home {
+  background: var(--azul);
+  color: var(--verde);
+}
+
+body.proyecto {
+  background: var(--verde);
+  color: var(--azul);
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+a[href^="mailto:"] {
+  text-decoration: none;
+}
+
+a[href^="mailto:"]:hover {
+  text-decoration: underline;
+}
+
+img {
+  display: block;
+}
+
+/* ---------- Lienzo y posicionamiento ---------- */
+
+.lienzo {
+  --u: calc(100cqw / 1512);
+  position: relative;
+  width: 100%;
+  height: calc(var(--h) * var(--u));
+  overflow: hidden;
+}
+
+.pos {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  font-size: calc(var(--fs) * var(--u));
+}
+
+/* Imágenes del collage */
+.foto {
+  object-fit: cover;
+}
+
+.ornamento {
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.centrado {
+  text-align: center;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ---------- Tipografía ---------- */
+
+.t-titulo {
+  font-family: var(--f-titulo);
+  font-weight: 400;
+}
+
+.t-nombre {
+  font-family: var(--f-texto);
+  font-weight: 700;
+}
+
+.t-pixel {
+  font-family: var(--f-boton);
+  font-weight: 400;
+  font-variation-settings: "CRSV" 0, "ELSH" 0, "ELXP" 0;
+}
+
+.t-medio {
+  font-weight: 500;
+}
+
+strong {
+  font-weight: 700;
+}
+
+/* ---------- Botones de navegación ---------- */
+
+.boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--verde);
+  color: var(--negro);
+  border: max(1px, calc(2 * var(--u))) solid var(--negro);
+  text-decoration: none;
+  font-family: var(--f-boton);
+  font-variation-settings: "CRSV" 0, "ELSH" 0, "ELXP" 0;
+  white-space: nowrap;
+}
+
+.boton:focus-visible,
+.tarjeta:focus-visible {
+  outline: 3px solid var(--blanco);
+  outline-offset: 4px;
+}
+
+/* cuadrito blanco que acompaña a cada botón */
+.cuadro {
+  background: var(--blanco);
+  border: max(1px, calc(var(--bw, 2) * var(--u))) solid var(--negro);
+  pointer-events: none;
+}
+
+/* Tarjetas de proyectos (home) */
+.tarjeta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--verde);
+  color: var(--negro);
+  border: max(2px, calc(4 * var(--u))) solid var(--negro);
+  text-decoration: none;
+  font-family: var(--f-boton);
+  font-variation-settings: "CRSV" 0, "ELSH" 0, "ELXP" 0;
+  white-space: nowrap;
+}
+
+/* El cuadro grande se estira con la categoría del proyecto */
+.cuadro--grande {
+  --bw: 4;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-left: calc(8 * var(--u));
+  font-family: var(--f-texto);
+  font-weight: 700;
+  font-size: calc(32 * var(--u));
+  color: var(--negro);
+  white-space: nowrap;
+  transition: width 0.25s ease;
+}
+
+.cuadro__texto {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* En la tarjeta, la categoría solo aparece en mobile (ver más abajo) */
+.tarjeta__categoria {
+  display: none;
+}
+
+/* Botón para volver al inicio en las páginas de proyecto */
+.volver {
+  position: fixed;
+  z-index: 10;
+}
+
+/* Bloques de texto con subtítulo en negrita */
+.bloque strong {
+  display: block;
+}
+
+/* ---------- Estados (hover / focus / active) ---------- */
+
+.boton,
+.tarjeta {
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Hover: solo en dispositivos con mouse, para que en el celular
+   no quede "pegado" después de tocar. Focus: para teclado. */
+@media (hover: hover) {
+  .boton:hover {
+    background: var(--negro);
+    color: var(--blanco);
+  }
+
+  .tarjeta:hover {
+    background: var(--negro);
+    color: var(--verde);
+    border-color: var(--verde);
+  }
+
+  .tarjeta:hover + .cuadro--grande {
+    width: calc(219 * var(--u));
+  }
+
+  .tarjeta:hover + .cuadro--grande .cuadro__texto {
+    opacity: 1;
+  }
+}
+
+.boton:focus-visible {
+  background: var(--negro);
+  color: var(--blanco);
+}
+
+.tarjeta:focus-visible {
+  background: var(--negro);
+  color: var(--verde);
+  border-color: var(--verde);
+}
+
+.tarjeta:focus-visible + .cuadro--grande {
+  width: calc(219 * var(--u));
+}
+
+.tarjeta:focus-visible + .cuadro--grande .cuadro__texto {
+  opacity: 1;
+}
+
+/* ---------- Visibilidad por versión ---------- */
+
+.solo-mobile {
+  display: none;
+}
+
+/* =========================================================
+   Mobile (diseño de 440 px)
+   ========================================================= */
+@media (max-width: 700px) {
+  .lienzo {
+    --u: calc(100cqw / 440);
+    height: calc(var(--mh) * var(--u));
+  }
+
+  .pos {
+    left: calc(var(--mx) * var(--u));
+    top: calc(var(--my) * var(--u));
+    width: calc(var(--mw) * var(--u));
+    height: calc(var(--mh) * var(--u));
+    font-size: calc(var(--mfs) * var(--u));
+  }
+
+  .solo-desktop {
+    display: none;
+  }
+
+  .solo-mobile {
+    display: initial;
+  }
+
+  .home .boton {
+    text-transform: uppercase;
+  }
+
+  .tarjeta {
+    border-width: max(1px, calc(2 * var(--u)));
+  }
+
+  .cuadro--grande {
+    --bw: 2;
+  }
+
+  .m-centrado {
+    text-align: center;
+  }
+
+  .m-medio {
+    font-weight: 500;
+  }
+
+  .m-separado p + p {
+    margin-top: 1em;
+  }
+}
+
+/* Estados en la versión mobile:
+   los botones se ponen negros con texto verde
+   y las tarjetas cambian el nombre por la categoría */
+@media (max-width: 700px) {
+  .boton:focus-visible,
+  .tarjeta:focus-visible {
+    color: var(--verde);
+  }
+
+  .tarjeta:focus-visible .tarjeta__nombre {
+    display: none;
+  }
+
+  .tarjeta:focus-visible .tarjeta__categoria {
+    display: inline;
+  }
+
+  .tarjeta:focus-visible + .cuadro--grande {
+    width: calc(var(--mw) * var(--u));
+  }
+
+  .cuadro__texto {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) and (hover: hover) {
+  .boton:hover {
+    color: var(--verde);
+  }
+
+  .tarjeta:hover .tarjeta__nombre {
+    display: none;
+  }
+
+  .tarjeta:hover .tarjeta__categoria {
+    display: inline;
+  }
+
+  .tarjeta:hover + .cuadro--grande {
+    width: calc(var(--mw) * var(--u));
+  }
+}
+
+/* Active (al hacer clic o tocar): va al final para ganarle al hover */
+.boton:active {
+  background: var(--blanco);
+  color: var(--rojo);
+  border-color: var(--blanco);
+}
+
+.tarjeta:active {
+  background: var(--azul);
+  color: var(--rojo);
+  border-color: var(--azul);
+}
+
+.tarjeta:active .tarjeta__nombre {
+  display: inline;
+}
+
+.tarjeta:active .tarjeta__categoria {
+  display: none;
+}
+
+/* =========================================================
+   Animaciones 
+   ========================================================= */
+
+/* 1. Aparición al hacer scroll */
+.revelar {
+  opacity: 0;
+}
+
+.revelar.visible {
+  animation: aparecer 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* 2. Cursor de la máquina de escribir */
+.cursor-escritura {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.9em;
+  margin-left: 0.05em;
+  vertical-align: -0.05em;
+  background: currentColor;
+  animation: parpadeo 0.8s steps(1) infinite;
+}
+
+@keyframes parpadeo {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 4. Ornamentos punto por punto*/
+.ornamento--pendiente {
+  opacity: 0;
+}
+
+/* 5. Parallax */
+.ornamento {
+  will-change: translate;
+}
+
+/* 6. Visor de imágenes */
+.proyecto .foto {
+  cursor: zoom-in;
+}
+
+.proyecto .foto:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 4px;
+}
+
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vmin;
+  background: var(--azul);
+  cursor: zoom-out;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+
+.visor.abierto {
+  opacity: 1;
+  visibility: visible;
+}
+
+.visor__imagen {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: 4px solid var(--negro);
+  cursor: default;
+  scale: 0.92;
+  transition: scale 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.visor.abierto .visor__imagen {
+  scale: 1;
+}
+
+.visor__cerrar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  border: 2px solid var(--negro);
+}
+
+/* Respeta a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .boton,
+  .tarjeta,
+  .cuadro--grande,
+  .cuadro__texto {
+    transition: none;
+  }
+}
